@@ -1,0 +1,10 @@
+[project]
+name = "architecture-pro-alexandrite"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.2",
+    "prometheus-client>=0.22.1",
+    "werkzeug>=3.1.3",
+]

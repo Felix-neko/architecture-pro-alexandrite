@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - target: 9090
+        published: 9090
+    volumes:
+      - type: bind
+        source: ./prometheus.ayml
+        target: /etc/prometheus/prometheus.yaml
+  app:
+    build:
+      context: app
+      dockerfile: ./Dockerfile
+    ports:
+      -   target: 8000
+          published: 8080
