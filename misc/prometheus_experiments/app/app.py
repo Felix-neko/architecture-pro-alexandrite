@@ -82,3 +82,7 @@ def random_metric():
     response_code = random.choice([200, 200, 200, 200, 200, 400, 401, 500]) # коды ответа
     # Создаем HTTP-ответ с выбранным кодом в качестве тела ответа и статуса
     return Response(str(response_code), status=response_code)
+
+# Точка входа для запуска приложения
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)

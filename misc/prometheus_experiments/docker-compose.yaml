@@ -8,8 +8,8 @@ services:
         published: 9090
     volumes:
       - type: bind
-        source: ./prometheus.ayml
-        target: /etc/prometheus/prometheus.yaml
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
   app:
     build:
       context: app
