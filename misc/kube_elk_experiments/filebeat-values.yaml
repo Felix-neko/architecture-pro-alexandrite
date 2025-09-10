@@ -1,10 +1,8 @@
 # filebeat-values.yaml
 # правильный формат для elastic/filebeat
 
-# ServiceAccount и RBAC
-serviceAccount:
-  create: true
-  name: filebeat
+# ServiceAccount и RBAC - правильная структура для elastic/filebeat chart
+serviceAccount: "filebeat"
 
 rbac:
   create: true
@@ -37,21 +35,8 @@ filebeatConfig:
 
     output.elasticsearch:
       hosts: ["http://elasticsearch-master.logging.svc.cluster.local:9200"]
-      username: "${ELASTIC_USERNAME}"
-      password: "${ELASTIC_PASSWORD}"
 
-# credentials → через secret
-extraEnvs:
-  - name: ELASTIC_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: elastic-credentials
-        key: username
-  - name: ELASTIC_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: elastic-credentials
-        key: password
+# No authentication needed since security is disabled
 
 daemonset:
   resources:
@@ -62,6 +47,4 @@ daemonset:
       memory: 400Mi
       cpu: 500m
 
-image:
-  tag: "8.10.0"
-  pullPolicy: IfNotPresent
+imagePullPolicy: "IfNotPresent"

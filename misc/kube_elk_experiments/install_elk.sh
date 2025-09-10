@@ -11,7 +11,8 @@ helm repo update
 
 helm install elasticsearch elastic/elasticsearch -n logging \
   --set replicas=1 \
-  --set resources.requests.memory=2Gi
+  --set resources.requests.memory=2Gi \
+  --set esConfig."elasticsearch\.yml"="xpack.security.enabled: false"
 
 helm install kibana elastic/kibana -n logging \
   --set service.type=ClusterIP

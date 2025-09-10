@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 BASEDIR=$(dirname "$0")
 
-delete namespace logging
-delete namespace web-services
+kubectl delete namespace logging
+kubectl delete namespace web-services
