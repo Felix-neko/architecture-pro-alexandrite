@@ -1,0 +1,26 @@
+# elasticsearch-values.yaml
+# Enable Elasticsearch security with custom password
+
+replicas: 1
+
+# Set custom password for elastic user
+secret:
+  password: "elastic"
+
+resources:
+  requests:
+    memory: 2Gi
+
+# Enable security with HTTP (no SSL)
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+    xpack.security.enrollment.enabled: false
+    xpack.security.http.ssl.enabled: false
+    xpack.security.transport.ssl.enabled: false
+
+volumeClaimTemplate:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 30Gi

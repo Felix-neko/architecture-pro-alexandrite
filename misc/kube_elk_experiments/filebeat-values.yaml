@@ -35,8 +35,10 @@ filebeatConfig:
 
     output.elasticsearch:
       hosts: ["http://elasticsearch-master.logging.svc.cluster.local:9200"]
+      username: "elastic"
+      password: "elastic"
 
-# No authentication needed since security is disabled
+# Authentication configured for elastic user
 
 daemonset:
   resources:
