@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi import FastAPI
 
-from server import run_server
+from common_api.server import run_server
 
 
 class ChildApp(FastAPI):
@@ -15,7 +15,7 @@ class ChildApp(FastAPI):
 
         @self.get("/world")
         async def hello() -> str:
-            return str(2 / 0)
+            # return str(2 / 0)
             return f"Child API: world!"
 
 

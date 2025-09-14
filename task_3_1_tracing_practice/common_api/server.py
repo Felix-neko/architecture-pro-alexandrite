@@ -18,7 +18,7 @@ def run_server(
     service_name: Optional[str] = None,
     port: int = 10000,
     log_level: str = "debug",
-    otel_endpoint: str = "http://localhost:4318/v1/traces",
+    # otel_endpoint: str = "http://localhost:4318/v1/traces",
 ):
     # Initialize OpenTelemetry, instrument FastAPI app, run FastAPI app.
     resource = Resource.create(
@@ -33,7 +33,7 @@ def run_server(
     # OTLP exporter: send to local Collector / Jaeger OTLP receiver
     # Default endpoint below assumes HTTP OTLP receiver on localhost:4318
     otlp_exporter = OTLPSpanExporter(
-        endpoint=otel_endpoint,  # <- change if needed
+        # endpoint=otel_endpoint,  # <- change if needed
         # timeout=10,  # optional
         # headers=(("api-key", "xxx"),)  # optional
     )

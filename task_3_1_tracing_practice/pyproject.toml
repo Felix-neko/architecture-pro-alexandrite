@@ -1,7 +1,7 @@
 [project]
-name = "architecture-pro-alexandrite"
+name = "otel-examples"
 version = "0.1.0"
-description = "Add your description here"
+description = "Интерпретатор и общие классы для родительского и дочернего API"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.116.1",

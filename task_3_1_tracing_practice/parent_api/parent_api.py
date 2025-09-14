@@ -4,13 +4,14 @@ import httpx
 from fastapi import FastAPI
 import requests
 
-from server import run_server
+from common_api.server import run_server
+from settings import parent_app_settings
 
 
 class ParentApp(FastAPI):
-    def __init__(self, child_api_url: str = "http://localhost:10001", *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._child_api_url = child_api_url
+
         self._async_client = httpx.AsyncClient()
 
         @self.on_event("shutdown")
@@ -24,7 +25,7 @@ class ParentApp(FastAPI):
 
         @self.get("/hello")
         async def hello() -> str:
-            r = requests.get(child_api_url + "/world")
+            r = requests.get(parent_app_settings.child_api_url + "/world")
             return f"Parent API: hello,\n{r.text}"
 
 
