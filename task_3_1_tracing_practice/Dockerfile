@@ -17,7 +17,7 @@ RUN uv sync
 COPY common_api /app/common_api
 
 ENV PYTHONPATH=/app
-ENV OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://192.168.16.1:4318/v1/traces
+#ENV OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://192.168.16.1:4318/v1/traces
 
 ###################
 # Child API stage
@@ -39,7 +39,7 @@ FROM common_api AS parent_api
 # Copy parent_api files
 COPY parent_api /app/parent_api
 
-ENV CHILD_API_URL=http://192.168.16.1:10001
+#ENV CHILD_API_URL=http://192.168.16.1:10001
 
 # Set the command to run parent_api
 # Порт 10000
