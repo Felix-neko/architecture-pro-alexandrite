@@ -1,0 +1,105 @@
+---
+# Child API StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: child-api
+  namespace: otel-samples
+spec:
+  serviceName: child-api
+  replicas: 1
+  selector:
+    matchLabels:
+      app: child-api
+  template:
+    metadata:
+      labels:
+        app: child-api
+    spec:
+      containers:
+      - name: child-api
+        image: ghcr.io/felix-neko/child_api:sha-bf42a14
+        ports:
+        - containerPort: 10001
+        env:
+        - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+          value: "http://my-jaeger-collector.jaeger.svc.cluster.local:4318/v1/traces"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+# Child API NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: child-api
+  namespace: otel-samples
+spec:
+  type: NodePort
+  selector:
+    app: child-api
+  ports:
+  - name: http
+    port: 10001
+    targetPort: 10001
+    nodePort: 30001
+    protocol: TCP
+
+---
+# Parent API StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: parent-api
+  namespace: otel-samples
+spec:
+  serviceName: parent-api
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parent-api
+  template:
+    metadata:
+      labels:
+        app: parent-api
+    spec:
+      containers:
+      - name: parent-api
+        image: ghcr.io/felix-neko/parent_api:sha-bf42a14
+        ports:
+        - containerPort: 10000
+        env:
+        - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+          value: "http://my-jaeger-collector.jaeger.svc.cluster.local:4318/v1/traces"
+        - name: CHILD_API_URL
+          value: "http://child-api.otel-samples.svc.cluster.local:10001"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+# Parent API NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: parent-api
+  namespace: otel-samples
+spec:
+  type: NodePort
+  selector:
+    app: parent-api
+  ports:
+  - name: http
+    port: 10000
+    targetPort: 10000
+    nodePort: 30000
+    protocol: TCP
