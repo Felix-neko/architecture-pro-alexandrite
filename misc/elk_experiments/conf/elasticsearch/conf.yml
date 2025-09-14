@@ -1,4 +1,14 @@
+# Имя кластера Elasticsearch - используется для группировки узлов
 cluster.name: "sample-elk"
+
+# Адрес сетевого интерфейса для привязки Elasticsearch
+# 0.0.0.0 означает прослушивание на всех доступных интерфейсах
 network.host: 0.0.0.0
-xpack.security.enabled: false # Отключить аутентификацию
-xpack.license.self_generated.type: basic # Тип лицензии "basic"
+
+# Отключение системы безопасности X-Pack для упрощения настройки
+# В продакшене рекомендуется включать безопасность
+xpack.security.enabled: false
+
+# Тип лицензии Elasticsearch - "basic" предоставляет базовую функциональность бесплатно
+# Включает мониторинг, но не включает продвинутые функции безопасности
+xpack.license.self_generated.type: basic

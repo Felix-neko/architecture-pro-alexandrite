@@ -1,15 +1,27 @@
+# Конфигурация входных данных для Filebeat
 filebeat.inputs:
+  # Тип входных данных - чтение файлов логов
   - type: log
+    # Включение этого входа (активация сбора логов)
     enabled: true
+    # Пути к файлам логов для мониторинга (поддерживает wildcards)
     paths:
       - /var/log/nginx/*.json
+    # Обработка JSON логов: размещать ключи JSON в корне документа
     json.keys_under_root: true
+    # Не перезаписывать существующие поля при конфликте имен
     json.overwrite_keys: false
+    # Добавлять поле с ошибками парсинга JSON (если они возникают)
     json.add_error_key: true
 
+# Конфигурация вывода в Logstash для дальнейшей обработки
 output.logstash:
+  # Включение отправки данных в Logstash
   enabled: true
+  # Адрес и порт Logstash сервера (имя контейнера:порт)
   hosts: ["logstash:5044"]
 
+# Настройка подключения к Kibana для управления индексами и дашбордами
 setup.kibana:
+  # URL адрес Kibana сервера
   host: "http://kibana:5601"

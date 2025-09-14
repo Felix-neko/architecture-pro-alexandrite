@@ -1,6 +1,18 @@
+# Имя сервера Kibana для идентификации в логах и мониторинге
 server.name: kibana
+
+# Адрес интерфейса для привязки Kibana сервера
+# 0.0.0.0 позволяет подключения с любого IP адреса
 server.host: 0.0.0.0
+
+# Публичный базовый URL для Kibana, используется для генерации ссылок
+# Должен соответствовать адресу, по которому пользователи обращаются к Kibana
 server.publicBaseUrl: "http://localhost:5601"
+
+# Включение мониторинга UI для контейнеризованного Elasticsearch
+# Позволяет отслеживать состояние кластера через интерфейс Kibana
 monitoring.ui.container.elasticsearch.enabled: true
 
+# Список хостов Elasticsearch для подключения Kibana
+# Kibana использует эти адреса для получения данных и метаданных
 elasticsearch.hosts: ["http://elasticsearch:9200"]
