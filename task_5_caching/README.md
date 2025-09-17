@@ -24,7 +24,6 @@
 * Развернуть Redis (3x master \+ 3x slave, из стандартного helm chart от bitnami).
 
 ### Кэширование фронтэнда и статики в MES API
-
 * серверное кэширование \+ вынос на отдельный BFF-сервис;  
   * в качестве бэкэнда серверного кэширования – используем Redis (скорее всего, BFF-сервер это поддерживает)  
 * включить клиентское кэширование картинок и JS, время жизни 15 минут;  
@@ -39,7 +38,7 @@
 * производить проактивное обновление кэша при старте MES API;  
 * если по какой-либо причине не удалось подключиться к кэшу – просто читаем из БД, как раньше;  
 * если по какой-то причине в кэше нет данных – читаем из БД, записываем данные в кэш;  
-* опционально – добавить вызов обновления кэша раз в N минут (отключаемое в настройках, в качестве резервного метода)
+* опционально – добавить вызов обновления кэша раз в N минут (отключаемое в настройках, в качестве резервного метода).
 
 На перспективу, если хочется уменьшить время пересчёта кэша, можно поработать со структурой БД:
 
@@ -74,8 +73,8 @@ _Диаграммы последовательностей для чтения �
 
 Здесь показан сценарий чтения страницы заказов с использованием кэша:
 * в случае попадания в кэш (нормальный сценарий);
-* в случае ненахождения данных в кэше
-* в случае недоступности данных в кэши (graceful degradation)
+* в случае ненахождения данных в кэше;
+* в случае недоступности данных в кэши (graceful degradation).
 
 ### Для обновления заказов
 ![Диаграммы последовательностей для обновления заказов](https://www.plantuml.com/plantuml/png/xLPTQnD157tVNt693rMXDBRgmqA4cgvLj7J99gXG26DscYoKJTZTweCKcYgejABqHPyiHN_0MXiQqw-_CFEFl7Ss7xkRf7uK5S67J3OxTywzSywTCmcSO8N3Wc61s1LjsPGReYMEHAY3-20-YsDn8lR48Rux5ctH0XKGoWtvJ3P52E90XAA3dmEAqpHM2UeUP73fgMZ9TOeK9t8z0yo7aiyzhS6ymAau3UO6aA6ibZchPl5xU7BMlAClkOZGx1P2urT0y1C25Xsr5ACqcmNi4VCvPCow7rGzxgifSpusK-2s4xrMJsFJzT41XnG5yWs8ZdmjNufG8ULPfSQBDOypMzDoEH0xQjzxkAOrOZcz750MGYwdQSGBJDuW1f3qz_Z-g9jhGsub24-klN1bUeO8TnwpW2l-D1m8YVO1Pga8KwpXJDKzctl-54R3KpzWmQgleqBRGF9WVRJNLcPjW4HqQZWGaZclGycScoqQ4C60PHGXGe4SJAHW9k3-RQDWW6FZPA8y5CASXybUSLOfdpSiIxDvF49pw_ZWETLQ0FNbA5BiO09Ya6Z5hODyZcI6uWkzHBKg941vjO4oEswrxDQVOEfbjkBp_YPY6Y7UErnyIcnYmH75esNgO4PKUR25XDJ9IfCPFdKBR8yhB_1MUM-gnlnoWxispLPgpAroFxM1NcjCPxEmU3TEcL9AQOunr4QOV3VUBgcDnTUgVedLtLFRCkuP-I9SXbk5nOMUw96g0zaL2fzOSXSBSqO1RZw42c84t2wp0EOCApzA-2H9sCTK9NuVoYrnB3SJHqDkfbiZLQewmRhgngX6FQe9dWwfgR3BOXznkp_Mm7W0CzdieCh84DGuN6kIz2ZqV0sWvFsX3eWb7hAQxSXSnrlDHV8X47iOWvvErdNQToSyFvVEPpzNhrt_2Vl1wBZzq2bKPnhF66RxPVz9uIGCA57WdpKWEk6ZqJv6Z2B1eTAgZMD8ylHnzRCR8uB-tSv0_VKMEuVkmIDrZRVb2wIWYHIqeokufThge6Uduw_Bo4XLivrrQdOKtZuUq7t4UuNFPzsWFT7RE87_3-GMNjmffNJuFez_qzt_k-y_whxV0000)
