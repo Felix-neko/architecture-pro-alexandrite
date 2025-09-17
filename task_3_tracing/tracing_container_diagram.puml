@@ -1,0 +1,82 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+AddElementTag("third-party", $bgColor="#f5f5f5", $borderColor="DarkGray", $fontColor="Black", $legendText="Компоненты сторонних производителей")
+AddRelTag("tracing", $textColor="red", $lineColor="red", $lineStyle=DashedLine())
+AddRelTag("tracing-solid", $textColor="red", $lineColor="red")
+
+AddElementTag("tracing2", $borderColor="red", $bgColor="white", $fontColor="red")
+
+
+
+LAYOUT_WITH_LEGEND()
+
+title Container diagram for Jewelry Store System (+ Tracing System)
+
+Person_Ext(customer, "Customer", "Description of external person.")
+Person_Ext(api_user, "API user", "Description of external person.")
+Person(seller, "Seller", "Operates with order, confirms manufacturing for the user")
+Person(operator, "Operator", "Takes order in work, manufactures jewelry")
+
+Person(developer, "Developer", "Reads tracing")
+
+System_Boundary(frontend, "Frontend Components") {
+    Container(internet_shop, "Internet Shop", "Vue, TypeScript, Three.js", "User can make an order, upload 3d model, work in 3d editor")
+    Container(crm, "CRM", "Vue, TypeScript", "Description of web browser container role/responsibility.")
+    Container(mes, "MES", "React, TypeScript", "provide interface to assign orders on operators, shows list of orders")
+}
+
+
+
+System_Boundary(internal_services, "Internal Services") {
+    System_Boundary(backend_services, "Backend Services") {
+        Container(shop_api, "Shop API", "SpringBoot", "- provide list of shop items\n- receives user generated or uploaded 3d file\n- save information about order from customer perspective")
+        Container(crm_api, "CRM API", "SpringBoot", "Description of container role/responsibility.")
+        Container(mes_api, "MES API", "C#", "- Assigns orders on operators\n- Shows list of orders\n- Calculates price of the order")
+    }
+
+    System_Boundary(infrastructure, "Infrastructure Services") {
+        ContainerDb(shop_db, "Shop DB", "PostgreSQL, third-party", "Holds main information about work with customers and its orders", $tags="third-party")
+        ContainerDb(mes_db, "MES db", "PostgreSQL, third-party", "Holds information about orders, its assignments on operators and statuses from MES perspective", $tags="third-party")
+        ContainerDb(files_storage, "3D files storage", "S3-based storage, third-party", "stores 3d files so that can be calculated", $tags="third-party")
+        ContainerQueue(message_queue, "Messages Queue", "RabbitMQ third-party", "Send messages about new orders, changes of statuses between containers, has several topics", $tags="third-party")
+    }
+
+    System(tracing_services, "Tracing Services", $tags="tracing2") {
+      Container(jaeger_collector, "Jaeger Collector", "Jaeger, third-party", "Collects distributed tracing data", $tags="third-party")
+      ContainerDb(jaeger_cassandra, "Jaeger Cassandra", "Cassandra, third-party", "Stores tracing data", $tags="third-party")
+      Container(jaeger_query, "Jaeger Query", "Jaeger, third-party", "Queries and displays tracing data", $tags="third-party")
+      ' Tracing relationships
+      Rel(jaeger_collector, jaeger_cassandra, "Stores traces", $tags="tracing-solid")
+      Rel(jaeger_query, jaeger_cassandra, "Queries traces", $tags="tracing-solid")
+    }
+
+    ' API tracing relationships
+    Rel(mes_api, jaeger_collector, "Sends traces", $tags="tracing")
+    Rel(crm_api, jaeger_collector, "Sends traces", $tags="tracing")
+    Rel(shop_api, jaeger_collector, "Sends traces", $tags="tracing")
+}
+
+' Relationships
+Rel(customer, internet_shop, "Uses")
+Rel(internet_shop, shop_api, "Makes API calls to")
+Rel(shop_api, shop_db, "Reads from and writes to")
+Rel(shop_api, files_storage, "uploads files")
+
+Rel(seller, crm, "Uses")
+Rel(crm, crm_api, "Makes API calls to")
+Rel(crm_api, shop_db, "Reads from and writes to")
+BiRel(crm_api, message_queue, "Sends/receives messages")
+Rel(files_storage, crm_api, "Provides files to")
+
+Rel(operator, mes, "Uses")
+Rel(mes, mes_api, "Makes API calls to")
+Rel(api_user, mes_api, "Makes API calls to")
+Rel(mes_api, mes_db, "Reads from and writes to")
+Rel(mes_api, files_storage, "Accesses files from")
+BiRel(mes_api, message_queue, "Sends/receives messages")
+
+Rel(developer, jaeger_query, "Reads tracing", $tags="tracing-solid")
+
+
+@enduml

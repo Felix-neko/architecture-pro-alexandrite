@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - target: 9090
+        published: 9090
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+  app:
+    build:
+      context: app
+      dockerfile: ./Dockerfile
+    ports:
+      -   target: 8000
+          published: 8080

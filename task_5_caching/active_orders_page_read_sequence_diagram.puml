@@ -1,0 +1,85 @@
+@startuml Cache-Aside Pattern
+
+title MES Система: Диаграмма последовательностей страницы заказов
+
+actor "Пользователь" as User
+participant "MES SPA" as SPA
+participant "MES API" as API
+participant "Redis" as Redis
+database "Postgres" as PG
+
+== Промах кеша: Загрузка из БД ==
+
+User -> SPA: Открыть страницу заказов
+activate SPA
+
+SPA -> API: GET /api/orders/active
+activate API
+
+API -> Redis: GET orders:active
+activate Redis
+Redis --> API: null (промах кеша)
+deactivate Redis
+
+API -> PG: SELECT * FROM orders WHERE status = 'active'\nORDER BY created_at DESC
+activate PG
+PG --> API: список активных заказов
+deactivate PG
+
+API -> Redis: SET orders:active {данные_заказов} EX 300
+activate Redis
+Redis --> API: OK
+deactivate Redis
+
+API --> SPA: 200 OK {данные_заказов}
+deactivate API
+
+SPA --> User: Отобразить страницу заказов
+deactivate SPA
+
+== Попадание в кеш ==
+
+User -> SPA: Обновить страницу заказов
+activate SPA
+
+SPA -> API: GET /api/orders/active
+activate API
+
+API -> Redis: GET orders:active
+activate Redis
+Redis --> API: {кешированные_данные_заказов}
+deactivate Redis
+
+API --> SPA: 200 OK {данные_заказов}
+deactivate API
+
+SPA --> User: Отобразить страницу заказов (быстро)
+deactivate SPA
+
+== Кеш недоступен: graceful degradation, запрос к БД ==
+
+User -> SPA: Открыть страницу заказов
+activate SPA
+
+SPA -> API: GET /api/orders/active
+activate API
+
+API -> Redis: GET orders:active
+activate Redis
+Redis --> API: Ошибка подключения
+deactivate Redis
+
+note right of API: Redis недоступен\nРезерв через БД
+
+API -> PG: SELECT * FROM orders WHERE status = 'active'\nORDER BY created_at DESC
+activate PG
+PG --> API: список активных заказов
+deactivate PG
+
+API --> SPA: 200 OK {данные_заказов}
+deactivate API
+
+SPA --> User: Отобразить страницу заказов
+deactivate SPA
+
+@enduml

@@ -1,0 +1,52 @@
+# filebeat-values.yaml
+# правильный формат для elastic/filebeat
+
+# ServiceAccount и RBAC - правильная структура для elastic/filebeat chart
+serviceAccount: "filebeat"
+
+rbac:
+  create: true
+
+# filebeat.yml (ConfigMap)
+filebeatConfig:
+  filebeat.yml: |
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          templates:
+            - condition:
+                equals:
+                  kubernetes.namespace: "web-services"
+              config:
+                - type: container
+                  containers.ids:
+                    - ${data.kubernetes.container.id}
+                  multiline.pattern: '^\s'
+                  multiline.negate: false
+                  multiline.match: after
+
+    processors:
+      - add_kubernetes_metadata:
+          in_cluster: true
+      - add_host_metadata: {}
+      - add_cloud_metadata: {}
+
+    logging.level: info
+
+    output.elasticsearch:
+      hosts: ["http://elasticsearch-master.logging.svc.cluster.local:9200"]
+      username: "elastic"
+      password: "elastic"
+
+# Authentication configured for elastic user
+
+daemonset:
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 400Mi
+      cpu: 500m
+
+imagePullPolicy: "IfNotPresent"
