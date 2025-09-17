@@ -11,7 +11,7 @@ AddElementTag("tracing2", $borderColor="red", $bgColor="white", $fontColor="red"
 
 LAYOUT_WITH_LEGEND()
 
-title Container diagram for Jewelry Store System
+title Container diagram for Jewelry Store System (+ Tracing System)
 
 Person_Ext(customer, "Customer", "Description of external person.")
 Person_Ext(api_user, "API user", "Description of external person.")

@@ -1,0 +1,97 @@
+@startuml Order Status Update
+
+title MES Система: Обновление статуса заказов
+
+actor "Оператор" as User
+participant "MES SPA" as SPA
+participant "MES API:\nосновной поток" as API
+database "Postgres" as PG
+database "Redis" as Redis
+participant "MES API:\nпоток обновления кэша" as CacheThread
+
+== Первое обновление заказа ==
+
+User -> SPA: Изменить статус заказа #123
+activate SPA
+
+SPA -> API: PUT /api/orders/123 {status: "В работе"}
+activate API
+
+API -> PG: UPDATE orders SET status = 'В работе' WHERE id = 123
+activate PG
+PG --> API: SUCCESS
+deactivate PG
+
+note right of API: Проверка флагов:\ncache_updating_now = false
+
+API -> CacheThread: Запустить обновление кеша
+activate CacheThread
+
+note right of CacheThread: Флаги:\ncache_updating_now = true\ncache_has_pending_changes = false
+
+API --> SPA: 200 OK
+deactivate API
+
+SPA --> User: Статус обновлен
+deactivate SPA
+
+CacheThread -> PG: SELECT * FROM orders WHERE status = 'active'\nORDER BY created_at DESC
+activate PG
+PG --> CacheThread: актуальные заказы
+deactivate PG
+
+CacheThread -> Redis: SET orders:active {обновленные_данные} EX 300
+activate Redis
+Redis --> CacheThread: OK
+deactivate Redis
+
+note right of CacheThread: Флаги:\ncache_updating_now = false\ncache_has_pending_changes = false
+
+deactivate CacheThread
+
+== Второе обновление (во время первого) ==
+
+User -> SPA: Изменить статус заказа #456
+activate SPA
+
+SPA -> API: PUT /api/orders/456 {status: "Завершен"}
+activate API
+
+API -> PG: UPDATE orders SET status = 'Завершен' WHERE id = 456
+activate PG
+PG --> API: SUCCESS
+deactivate PG
+
+note right of API: Проверка флагов:\ncache_updating_now = true
+
+note right of API: Устанавливаем флаг:\ncache_has_pending_changes = true
+
+API --> SPA: 200 OK
+deactivate API
+
+SPA --> User: Статус обновлен
+deactivate SPA
+
+== Автоматический перезапуск обновления кеша ==
+
+note right of CacheThread: Предыдущее обновление завершилось\nПроверка: cache_has_pending_changes = true
+
+activate CacheThread
+
+note right of CacheThread: Флаги:\ncache_updating_now = true\ncache_has_pending_changes = false
+
+CacheThread -> PG: SELECT * FROM orders WHERE status = 'active'\nORDER BY created_at DESC
+activate PG
+PG --> CacheThread: актуальные заказы
+deactivate PG
+
+CacheThread -> Redis: SET orders:active {обновленные_данные} EX 300
+activate Redis
+Redis --> CacheThread: OK
+deactivate Redis
+
+note right of CacheThread: Флаги:\ncache_updating_now = false\ncache_has_pending_changes = false
+
+deactivate CacheThread
+
+@enduml

@@ -2,14 +2,14 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 AddElementTag("third-party", $bgColor="#f5f5f5", $borderColor="DarkGray", $fontColor="Black", $legendText="Компоненты сторонних производителей")
-AddRelTag("logging", $textColor="blue", $lineColor="blue", $lineStyle=DashedLine())
-AddRelTag("logging-solid", $textColor="blue", $lineColor="blue")
+AddRelTag("logging", $textColor="red", $lineColor="red", $lineStyle=DashedLine())
+AddRelTag("logging-solid", $textColor="red", $lineColor="red")
 
-AddElementTag("logging2", $borderColor="blue", $bgColor="white", $fontColor="blue")
+AddElementTag("logging2", $borderColor="red", $bgColor="white", $fontColor="red")
 
 LAYOUT_WITH_LEGEND()
 
-title Container diagram for Jewelry Store System
+title Container diagram for Jewelry Store System (+ Logging System)
 
 Person_Ext(customer, "Customer", "Description of external person.")
 Person_Ext(api_user, "API user", "Description of external person.")
